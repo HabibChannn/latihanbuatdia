@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+
+    <title>Habib Awaludin M | Upload Diary Note Practice</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jua&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+      /* Styling untuk profile image */
+      .profile-cover {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .profile-image-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-top: -75px; /* Setengah dari tinggi gambar profil */
+        margin-bottom: 20px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 5px solid #fff;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    </style>
+
+    <script>
+      $(document).ready(function () {
+        listing();
+      });
+
+      function listing() {
+        $.ajax({
+          type: "GET",
+          url: "/diary",
+          success: function (response) {
+            let articles = response["articles"];
+            for (let i = 0; i < articles.length; i++) {
+              let title = articles[i]["title"];
+              let content = articles[i]["content"];
+              let profileImage =
+                articles[i]["profile_image"] || "default-profile-image.jpg";
+              let coverImage =
+                articles[i]["cover_image"] || "default-cover-image.jpg";
+              let temp_html = `
+                          <div class="col-4">
+                              <div class="card">
+                                  <img src="../${coverImage}" class="card-img-top profile-cover" alt="...">
+                                  <div class="profile-image-container">
+                                      <img src="../${profileImage}" class="profile-image" alt="Profile Image">
+                                  </div>
+                                  <div class="card-body">
+                                      <h5 class="card-title">${title}</h5>
+                                      <p class="card-text">${content}</p>
+                                      <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                                  </div>
+                              </div>
+                          </div>
+                      `;
+              $("#cards-box").append(temp_html);
+            }
+          },
+        });
+      }
+
+      function saveDiary1() {
+        let title = $("#image-title").val();
+        if (!title) {
+          return alert("Hey Kamu Lupa title:)");
+        }
+        let content = $("#image-description").val();
+        if (!content) {
+          return alert("Hey Kamu Lupa description:)");
+        }
+
+        let profileImage = $("#profile-image").prop("files")[0];
+        let coverImage = $("#cover-image").prop("files")[0];
+
+        let form_data = new FormData();
+        form_data.append("profile_image", profileImage);
+        form_data.append("cover_image", coverImage);
+        form_data.append("title_give", title);
+        form_data.append("content_give", content);
+
+        $.ajax({
+          type: "POST",
+          url: "/diary",
+          data: form_data,
+          contentType: false,
+          processData: false,
+          success: function (response) {
+            console.log(response);
+            window.location.reload();
+          },
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+          <h1 class="display-5 fw-bold">Personal Diary</h1>
+          <div class="mb-3">
+            <input class="form-control" type="file" id="profile-image" />
+          </div>
+          <div class="mb-3">
+            <input class="form-control" type="file" id="cover-image" />
+          </div>
+          <div class="mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="image-title"
+              placeholder="The title of your image"
+            />
+          </div>
+          <div class="mb-3">
+            <textarea
+              placeholder="The description of your image"
+              class="form-control"
+              id="image-description"
+              rows="3"
+            ></textarea>
+          </div>
+          <button onclick="saveDiary1()" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+      <div class="row justify-content-start" id="cards-box">
+        <!-- Kartu-kartu diary akan ditambahkan oleh JavaScript -->
+      </div>
+    </div>
+  </body>
+</html>
