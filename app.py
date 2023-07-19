@@ -1,11 +1,21 @@
-from flask import Flask, render_template, jsonify, request
-from pymongo import MongoClient
 import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+from flask import Flask, render_template, request, jsonify
+from pymongo import MongoClient
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+MONGODB_URI= os.environ.get("mongodb+srv://AyangFreya:AyangElla@projectayang.c1mw30u.mongodb.net/")
+DB_NAME = os.environ.get("Ayang_freya")
+
+client = MongoClient("mongodb+srv://AyangFreya:AyangElla@projectayang.c1mw30u.mongodb.net/?retryWrites=true&w=majority")
+                         
+db = client['Ayang_freya']
 
 app = Flask(__name__)
-
-client = MongoClient('mongodb+srv://AyangFreya:AyangElla@projectayang.c1mw30u.mongodb.net/')
-db = client['Ayang_freya']
 
 app.config['UPLOAD_FOLDER'] = 'static'
 
